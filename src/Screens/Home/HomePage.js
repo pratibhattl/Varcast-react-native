@@ -65,19 +65,27 @@ const HomePage = props => {
   //Fetch Following User Data
   const fetchUserData = async () => {
     try {
-      const response = await apiCall('follow/followings', 'GET');
-      if (
-        response &&
-        response.data &&
-        response.data.users &&
-        response.data.users.length > 0
-      ) {
-        setUserData(response.data.users[0]);
-        console.log('User Data:', response.data.users[0]);
-        // console.log(userData);
+      const endpoint = 'follow/followings';
+      const response = await apiCall(endpoint, 'GET', {}, token);
+
+      console.log('Raw response:', response); // Log the raw response
+
+      if (response && response.status === true && response.data) {
+        const data = response.data; // Assuming response is already parsed as JSON
+
+        const usermappedData = data.map(item => ({
+          name: item.followings.name,
+          email: item.followings.email,
+          imageUrl: item.followings.full_path_image,
+        }));
+
+        setUserData(usermappedData); // Ensure the state update function is correct
+        console.log('User Data', usermappedData);
+      } else {
+        console.log('Unexpected response structure:', response);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching user data:', error);
     }
   };
 
@@ -355,7 +363,7 @@ const HomePage = props => {
                       backgroundColor: 'transparent',
                     }}>
                     <Image
-                      source={{uri: item.imageUrl}}
+                      source={{uri: item.full_path_image}}
                       style={{
                         width: 128,
                         height: 110,

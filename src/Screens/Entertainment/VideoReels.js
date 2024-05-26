@@ -1,29 +1,36 @@
 import {View, Text, FlatList, StyleSheet, Pressable} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {Image} from 'react-native';
 import ClockCircleIcon from '../../assets/icons/ClockCircleIcon';
 import Theme from '../../Constants/Theme';
 import EyeOpen from '../../assets/icons/EyeOpen';
 import NavigationService from '../../Services/Navigation';
 
-const VideoReels = ({users}) => {
-  const [videoImages, setVideoImages] = useState([]);
-
-  useEffect(() => {
-    if (users && users.length > 0) {
-      const userVideos = users[0].videos.map(video => ({
-        img: {uri: video.url},
-        title: video.title,
-        duration: video.duration,
-      }));
-      setVideoImages(userVideos);
-    }
-  }, [users]);
-
+const VideoReels = () => {
+  const [allImage, setAllImage] = useState([
+    {img: require('../../assets/images/image103.png')},
+    {img: require('../../assets/images/image104.png')},
+    {img: require('../../assets/images/image105.png')},
+    {img: require('../../assets/images/image154.png')},
+    {img: require('../../assets/images/image155.png')},
+    {img: require('../../assets/images/image156.png')},
+    {img: require('../../assets/images/image157.png')},
+    // {img:require('../../assets/images/image157(1).png')},
+    {img: require('../../assets/images/image158.png')},
+    {img: require('../../assets/images/image159.png')},
+    {img: require('../../assets/images/image160.png')},
+    {img: require('../../assets/images/image161.png')},
+    {img: require('../../assets/images/image162.png')},
+    {img: require('../../assets/images/image105.png')},
+    {img: require('../../assets/images/image154.png')},
+    {img: require('../../assets/images/image155.png')},
+    {img: require('../../assets/images/image156.png')},
+    {img: require('../../assets/images/image103.png')},
+  ]);
   return (
     <View style={styles.container}>
       <FlatList
-        data={videoImages}
+        data={allImage}
         //    horizontal
         numColumns={3}
         showsHorizontalScrollIndicator={false}
@@ -39,10 +46,11 @@ const VideoReels = ({users}) => {
                 marginTop: 10,
               }}>
               <Image
-                source={item.img}
+                source={item?.img}
                 style={{
                   height: 180,
-                  width: 180,
+                  width: 120,
+                  borderRadius: 15,
                 }}
                 resizeMode="cover"
               />

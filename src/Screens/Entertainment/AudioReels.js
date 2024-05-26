@@ -1,41 +1,37 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, FlatList, StyleSheet, Pressable, Image} from 'react-native';
+import {View, Text, FlatList, StyleSheet, Pressable} from 'react-native';
+import React, {useState} from 'react';
+import {Image} from 'react-native';
 import Theme from '../../Constants/Theme';
+import {ClipPath} from 'react-native-svg';
 import ClockCircleIcon from '../../assets/icons/ClockCircleIcon';
 import NavigationService from '../../Services/Navigation';
 
-const AudioReels = ({users}) => {
-  const [podcastImages, setPodcastImages] = useState([]);
-
-  useEffect(() => {
-    console.log('Users:', users);
-    if (users && users.length > 0) {
-      const userPodcasts = users[0].podcasts.map(podcast => ({
-        img: {uri: podcast.imageUrl},
-        id: podcast.id,
-        title: podcast.title,
-        duration: podcast.duration,
-      }));
-      console.log('User Podcasts:', userPodcasts);
-      setPodcastImages(userPodcasts);
-    }
-  }, [users]);
-  console.log('Podcasts:', podcastImages);
-  const handlePodcastPress = podcastId => {
-    // Navigate to the podcast details page
-    const clickedPodcast = users[0].podcasts.find(
-      podcasts => podcasts.id === podcastId,
-    );
-    if (clickedPodcast) {
-      // Navigate to the podcast details page and pass only the clicked podcast data
-      NavigationService.navigate('PodcastIndex', {podcastData: clickedPodcast});
-    }
-  };
-
+const AudioReels = () => {
+  const [allImage, setAllImage] = useState([
+    {img: require('../../assets/images/image103.png')},
+    {img: require('../../assets/images/image97.png')},
+    {img: require('../../assets/images/image105.png')},
+    {img: require('../../assets/images/image154.png')},
+    {img: require('../../assets/images/image155.png')},
+    {img: require('../../assets/images/image156.png')},
+    {img: require('../../assets/images/image157.png')},
+    // {img:require('../../assets/images/image157(1).png')},
+    {img: require('../../assets/images/image158.png')},
+    {img: require('../../assets/images/image159.png')},
+    {img: require('../../assets/images/image160.png')},
+    {img: require('../../assets/images/image161.png')},
+    {img: require('../../assets/images/image162.png')},
+    {img: require('../../assets/images/image105.png')},
+    {img: require('../../assets/images/image154.png')},
+    {img: require('../../assets/images/image155.png')},
+    {img: require('../../assets/images/image156.png')},
+    {img: require('../../assets/images/image103.png')},
+  ]);
   return (
     <View style={styles.container}>
       <FlatList
-        data={podcastImages}
+        data={allImage}
+        //    horizontal
         numColumns={2}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
@@ -43,10 +39,10 @@ const AudioReels = ({users}) => {
         renderItem={({item, index}) => {
           return (
             <Pressable
-              onPress={() => NavigationService.navigate('PodcastIndex', {item})}
+              onPress={() => NavigationService.navigate('PodcastIndex')}
               key={index}
               style={{
-                marginRight: index % 2 === 0 ? 15 : 0,
+                marginRight: index % 2 == 0 ? 15 : 0,
                 marginTop: 10,
                 borderRadius: 15,
                 borderTopRightRadius: 15,
@@ -54,7 +50,7 @@ const AudioReels = ({users}) => {
                 overflow: 'hidden',
               }}>
               <Image
-                source={item.img}
+                source={item?.img}
                 style={{
                   height: 180,
                   width: 180,
@@ -78,7 +74,7 @@ const AudioReels = ({users}) => {
                     color: '#fff',
                     fontSize: Theme.sizes.s13,
                   }}>
-                  {item.title}
+                  Lorem ipsum dolor sit amet, consectetur
                 </Text>
               </View>
               <View
@@ -99,7 +95,7 @@ const AudioReels = ({users}) => {
                     color: '#fff',
                     fontSize: Theme.sizes.s12,
                   }}>
-                  {item.id}
+                  {index + 1}
                 </Text>
               </View>
               <View
@@ -123,7 +119,7 @@ const AudioReels = ({users}) => {
                     fontSize: 11,
                     marginHorizontal: 3,
                   }}>
-                  {item.duration}
+                  2.45
                 </Text>
               </View>
             </Pressable>
@@ -135,7 +131,6 @@ const AudioReels = ({users}) => {
 };
 
 export default AudioReels;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
