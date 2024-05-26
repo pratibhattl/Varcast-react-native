@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "536850301968",
+    "project_id": "varcast-cd96b",
+    "storage_bucket": "varcast-cd96b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:536850301968:android:0cc4c54b197e3c98deb695",
+        "android_client_info": {
+          "package_name": "com.varcast.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZhTdECA8LsJ-uKng97yeyjBKQAkqSdy8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
