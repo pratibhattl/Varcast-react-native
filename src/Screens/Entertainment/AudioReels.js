@@ -11,7 +11,7 @@ const AudioReels = ({users}) => {
     console.log('Users:', users);
     if (users && users.length > 0) {
       const userPodcasts = users[0].podcasts.map(podcast => ({
-        img: {uri: podcast.url},
+        img: {uri: podcast.imageUrl},
         id: podcast.id,
         title: podcast.title,
         duration: podcast.duration,

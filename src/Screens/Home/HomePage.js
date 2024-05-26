@@ -63,18 +63,22 @@ const HomePage = props => {
   };
 
   //Fetch Following User Data
-  const fetchUserData = () => {
-    fetch('https://dev2024.co.in/web/varcast/user-1.json')
-      .then(response => response.json())
-      .then(data => {
-        if (data && data.users && data.users.length > 0) {
-          setUserData(data.users[0]);
-          // console.log(userData);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+  const fetchUserData = async () => {
+    try {
+      const response = await apiCall('follow/followings', 'GET');
+      if (
+        response &&
+        response.data &&
+        response.data.users &&
+        response.data.users.length > 0
+      ) {
+        setUserData(response.data.users[0]);
+        console.log('User Data:', response.data.users[0]);
+        // console.log(userData);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   };
 
   // Fetching Popular Episode
@@ -351,7 +355,7 @@ const HomePage = props => {
                       backgroundColor: 'transparent',
                     }}>
                     <Image
-                      source={{uri: item.image}}
+                      source={{uri: item.imageUrl}}
                       style={{
                         width: 128,
                         height: 110,

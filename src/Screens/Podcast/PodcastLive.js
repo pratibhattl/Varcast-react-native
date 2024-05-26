@@ -445,7 +445,7 @@ const PodcastLive = props => {
                 overflow: 'hidden',
               }}>
               <Image
-                source={{uri: selectedData.image}}
+                source={{uri: selectedData.imageUrl}}
                 style={{
                   height: 140,
                   width: 140,

@@ -17,10 +17,14 @@ import Theme from '../../Constants/Theme';
 import LinearGradient from 'react-native-linear-gradient';
 import MicroPhoneIcon from '../../assets/icons/MicrophoneIcon';
 import NavigationService from '../../Services/Navigation';
+import {useSelector} from 'react-redux';
+import {apiCall} from '../../Services/Service';
 import {useTranslation} from 'react-i18next';
+
 const {width, height} = Dimensions.get('screen');
 
 const SearchIndex = props => {
+  const token = useSelector(state => state.authData.token);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [cat, setCat] = useState(0);
@@ -29,28 +33,29 @@ const SearchIndex = props => {
   useEffect(() => {
     console.log('Category changed:', cat);
     const fetchData = async () => {
-      let url = '';
+      let endpoint = '';
       switch (cat) {
         case 0: // Live
-          url = 'https://dev2024.co.in/web/varcast/all-live.json';
+          endpoint = 'lives/list';
           break;
         case 1: // Podcast
-          url = 'https://dev2024.co.in/web/varcast/all-podcast.json';
+          endpoint = 'podcast/list';
           break;
         case 2: // Video
-          url = 'https://dev2024.co.in/web/varcast/all-videos.json';
+          endpoint = 'videos/list';
           break;
         default:
-          url = '';
+          endpoint = '';
       }
 
-      if (url !== '') {
+      if (endpoint !== '') {
         try {
-          const response = await fetch(url);
-          const responseData = await response.json();
-          setData(responseData);
-          setFilteredData(responseData);
-          console.log('Data received:', responseData);
+          const response = await apiCall(endpoint, 'GET', {}, token);
+          if (response && response.data && response.data.listData) {
+            setData(response.data.listData);
+            setFilteredData(response.data.listData);
+            console.log('Data received:', response.data.listData);
+          }
         } catch (error) {
           console.error('Error fetching data:', error);
         }
@@ -58,25 +63,22 @@ const SearchIndex = props => {
     };
 
     fetchData(); // Call fetchData inside the useEffect callback
-  }, [cat]);
+  }, [cat, token]);
 
-  // Initialize useTranslation hook
   const {t} = useTranslation();
-  // Inside the handleSearch function
+
   const handleSearch = query => {
-    console.log('Search Query:', query); // Log the search query
+    console.log('Search Query:', query);
     setSearchQuery(query);
 
     if (data && Array.isArray(data)) {
       if (query === '') {
-        // If search query is empty, show all data
         setFilteredData(data);
       } else {
-        // Otherwise, filter data based on search query
         const filtered = data.filter(item =>
           item.title.toLowerCase().includes(query.toLowerCase()),
         );
-        console.log('Filtered Data:', filtered); // Log the filtered data
+        console.log('Filtered Data:', filtered);
         setFilteredData(filtered);
       }
     }
@@ -86,7 +88,6 @@ const SearchIndex = props => {
     <SafeAreaView style={styles.container}>
       <StatusBar
         backgroundColor={'transparent'}
-        // animated={true}
         barStyle={'light-content'}
         translucent={true}
       />
@@ -102,11 +103,7 @@ const SearchIndex = props => {
             fontFamily: Theme.FontFamily.semiBold,
             fontSize: Theme.sizes.s16,
           }}
-          mainContainerStyle={
-            {
-              //   marginHorizontal:20
-            }
-          }
+          mainContainerStyle={{}}
           rightAction={<MicroPhoneIcon />}
           leftIcon={{
             name: 'search',
@@ -114,8 +111,6 @@ const SearchIndex = props => {
             color: 'rgba(255, 255, 255, 0.54)',
             size: 21,
           }}
-          // secureTextEntry={passwordShow ? false : true}
-          // onRightIconPress={() => setPasswordShow(!passwordShow)}
           inputContainerStyle={styles.input_container_sty}
           style={styles.text_style}
         />
@@ -145,7 +140,6 @@ const SearchIndex = props => {
                   marginRight: 10,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  //   paddingHorizontal:10
                 }}>
                 <Text
                   style={{
@@ -153,7 +147,6 @@ const SearchIndex = props => {
                       cat == index ? '#131313' : 'rgba(255, 255, 255, 0.54)',
                     fontSize: 16,
                     fontFamily: Theme.FontFamily.normal,
-                    // marginTop:5
                   }}>
                   {t(item)}
                 </Text>
@@ -161,17 +154,12 @@ const SearchIndex = props => {
             );
           }}
         />
+
         <FlatList
-          data={
-            cat === 0
-              ? filteredData.live || []
-              : cat === 1
-              ? filteredData.podcast || []
-              : filteredData.Publication || []
-          }
+          data={filteredData}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{paddingBottom: 20, paddingTop: 5}}
-          renderItem={({item, index}) => {
+          renderItem={({item}) => {
             return (
               <LinearGradient
                 colors={[
@@ -183,26 +171,20 @@ const SearchIndex = props => {
                 ]}
                 start={{x: 0, y: 0}}
                 end={{x: 0.6, y: 0}}
-                // useAngle={true} angle={90}
-                // angleCenter={{ x: 0.5, y: 0.5 }}
                 style={{
                   flex: 1,
                   height: 120,
                   width: width - 40,
                   borderRadius: 15,
-                  //   alignSelf: 'center',
                   marginTop: 10,
                   flexDirection: 'row',
-                  //   alignItems:'center',
                   padding: 10,
                   alignSelf: 'center',
-                  //   justifyContent:'center'
-                  // marginHorizontal:23
                 }}>
                 <View
                   style={{marginLeft: 3, borderRadius: 10, overflow: 'hidden'}}>
                   <Image
-                    source={{uri: item.image}}
+                    source={{uri: item.imageUrl}}
                     style={{
                       height: 100,
                       width: 100,
@@ -213,19 +195,15 @@ const SearchIndex = props => {
                 <Pressable
                   onPress={() => {
                     if (cat === 0) {
-                      // Navigate to Live Detail page
                       NavigationService.navigate('PodcastLive', {item});
                     } else if (cat === 1) {
-                      // Navigate to Podcast Live page
                       NavigationService.navigate('PodcastLive', {item});
                     } else if (cat === 2) {
-                      // Navigate to Podcast Detail page
                       NavigationService.navigate('VideoLive', {item});
                     }
                   }}
                   style={{
                     marginHorizontal: 10,
-                    // paddingTop:5,
                     width: '60%',
                   }}>
                   <Pressable
@@ -243,15 +221,11 @@ const SearchIndex = props => {
                         color: '#fff',
                         fontSize: 14,
                         fontFamily: Theme.FontFamily.normal,
-                        //   marginRight: 5,
                       }}>
                       {t('Live')}
                     </Text>
                   </Pressable>
-                  <View
-                    style={{
-                      marginTop: 12,
-                    }}>
+                  <View style={{marginTop: 12}}>
                     <Text
                       style={{
                         color: '#fff',
@@ -268,7 +242,7 @@ const SearchIndex = props => {
                         fontFamily: Theme.FontFamily.light,
                         marginLeft: 5,
                       }}>
-                      {item.views} • {item.created_by_name}
+                      {item.views} • {item.created_at}
                     </Text>
                   </View>
                 </Pressable>
@@ -282,14 +256,11 @@ const SearchIndex = props => {
 };
 
 export default SearchIndex;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#131313',
-    // paddingTop: 55,
-    // height:height
-    // paddingHorizontal:10
-    // height:100s
   },
   input_container_sty: {
     paddingHorizontal: 10,
@@ -302,10 +273,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
     alignSelf: 'center',
     marginTop: Platform.OS === 'ios' ? 40 : 60,
-    // borderWidth: 0.7,
-    // padding:0
-    // backfaceVisibility:'hidden'
-    // elevation:3
   },
   text_style: {
     fontFamily: Theme.FontFamily.normal,
