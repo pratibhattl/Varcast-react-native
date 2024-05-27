@@ -36,7 +36,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import {VESDK, CanvasAction, AudioClip} from 'react-native-videoeditorsdk';
 import {requestMultiple, PERMISSIONS} from 'react-native-permissions';
 import {PermissionsAndroid} from 'react-native';
-import {postApi} from '../../Services/Service';
+import {apiCall} from '../../Services/Service';
 import HelperFunctions from '../../Constants/HelperFunctions';
 
 // import { loadingState } from "../../../../../../../../";
@@ -356,7 +356,7 @@ const PublicationIndex = props => {
       keyword: '',
       page: null,
     };
-    postApi('api/all-music', data, '')
+    apiCall('api/all-music', data, '')
       .then(response => {
         // console.log('response',response)
         if (response?.status == 'success') {
