@@ -38,6 +38,8 @@ import {requestMultiple, PERMISSIONS} from 'react-native-permissions';
 import {PermissionsAndroid} from 'react-native';
 import {apiCall} from '../../Services/Service';
 import HelperFunctions from '../../Constants/HelperFunctions';
+import DocumentPicker from 'react-native-document-picker';
+import RNFS from 'react-native-fs';
 
 // import { loadingState } from "../../../../../../../../";
 const {width, height} = Dimensions.get('screen');
@@ -52,6 +54,8 @@ const PublicationIndex = props => {
   const customProp = route.params?.showButton;
   const [loadingStates, changeloadingStates] = useState(false);
   const [Imagee, changeImagee] = useState('');
+  const [pickedImg, setPickedImg] = useState();
+  const [audio, setAudio] = useState();
 
   const [allImage, setAllImage] = useState([
     {
@@ -82,8 +86,8 @@ const PublicationIndex = props => {
     '007eJxTYJDTnWE2W0rEvP34VofPyjYnvafsOlvB7Tep6Oo8p+9cz64rMKSmmqWZGqcamqaZW5gYG6UlmVmYGadZJiWmpKRYJiUZ8+uxpjUEMjJo/QpkYIRCEJ+FoSS1uISBAQD59R5T';
   const [cat, setCat] = useState('Publication');
   const [option, setOption] = useState('');
-  const [Name, setName] = useState('');
-  const [overView, setOverview] = useState('');
+  const [name, setName] = useState('');
+  const [overView, setOverView] = useState('');
   const [Loder, setLoader] = useState(false);
   const {t} = useTranslation();
   const [Musiclist, setMusiclist] = useState([]);
@@ -375,6 +379,71 @@ const PublicationIndex = props => {
         setLoader(false);
       });
   };
+
+  //  Create new podcast //
+
+  let formData = new FormData();
+
+  const uploadFileOnPressHandler = async () => {
+    try {
+      const pickedFile = await DocumentPicker.pickSingle({
+        type: [DocumentPicker.types.allFiles],
+      });
+      console.log('pickedFile', pickedFile);
+
+      pickedFile.type === 'audio/mpeg'
+        ? setAudio(pickedFile)
+        : setPickedImg(pickedFile);
+
+      // await RNFS.readFile(pickedFile.uri, 'base64').then(data => {
+      //   console.log('base64', data);
+      // });
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        console.log(err);
+      } else {
+        console.log(error);
+        throw err;
+      }
+    }
+  };
+
+  formData.append('title', name);
+  formData.append('overview', overView);
+  formData.append('image', pickedImg);
+  formData.append('image', audio);
+  // formData.append('videoUrl', {
+  //   uri: 'https://www.youtube.com/watch?v=ixr7ZYgH_6I',
+  //   filename: 'avc',
+  //   type: 'video/mp4',
+  // });
+
+  console.log(formData);
+
+  const fileSubmit = () => {
+    setLoader(true);
+    let data = formData;
+    apiCall('odcast/create', 'POST', formData)
+      .then(response => {
+        console.log('response', response);
+      })
+      .catch(error => {
+        HelperFunctions.showToastMsg(error?.message);
+        setLoader(false);
+      })
+      .finally(() => {
+        setName('');
+        setOverView('');
+        setPickedImg();
+        setAllImage();
+        setLoader(false);
+        HelperFunctions.showToastMsg('Podcast has been sucessfully uploaded');
+        NavigationService.navigate('ProfileIndex');
+      });
+  };
+
+  // -------------------------------------------------------------------------------------------------------------//
+
   useEffect(() => {
     fetchMusicList();
   }, []);
@@ -529,6 +598,7 @@ const PublicationIndex = props => {
           <View
             style={{...styles.container, alignItems: 'center', height: height}}>
             <Pressable
+              onPress={async () => await uploadFileOnPressHandler()}
               style={{
                 height: 130,
                 width: 130,
@@ -541,10 +611,12 @@ const PublicationIndex = props => {
                 borderWidth: 2,
                 borderColor: 'rgba(255, 255, 255, 0.14)',
               }}>
-              <GallaryIcon />
+              {pickedImg?.uri && <Image source={pickedImg.uri} />}
+
+              {!pickedImg && <GallaryIcon />}
             </Pressable>
             <AppTextInput
-              value={Name}
+              value={name}
               onChangeText={a => setName(a)}
               placeholder="Name Podcast"
               placeholderTextColor={'rgba(255, 255, 255, 0.54)'}
@@ -563,7 +635,7 @@ const PublicationIndex = props => {
             />
             <AppTextInput
               value={overView}
-              onChangeText={a => setOverview(a)}
+              onChangeText={a => setOverView(a)}
               placeholder="Overview"
               placeholderTextColor={'rgba(255, 255, 255, 0.44)'}
               inputStyle={{fontSize: 15}}
@@ -579,7 +651,43 @@ const PublicationIndex = props => {
               inputContainerStyle={styles.input_container_sty}
               style={styles.text_style}
             />
+
+            <View style={styles.upload}>
+              {audio && (
+                <Text
+                  style={{
+                    ...styles.upload_text,
+                    width: 100,
+                    overflow: 'hidden',
+                    marginRight: 10,
+                  }}>
+                  {audio.name}
+                </Text>
+              )}
+              {!audio && (
+                <Text style={styles.upload_text}>Upload Audio File</Text>
+              )}
+              <Pressable
+                style={styles.upload_btn}
+                onPress={async () => await uploadFileOnPressHandler()}>
+                <Text
+                  style={{
+                    fontFamily: Theme.FontFamily.normal,
+                    textAlign: 'center',
+                    fontSize: 15,
+                    color: '#fff',
+                  }}>
+                  Upload
+                </Text>
+              </Pressable>
+            </View>
+
             <Pressable
+              onPress={fileSubmit}
+              style={{...styles.upload_btn, width: 350, marginTop: 20}}>
+              <Text style={styles.upload_text}>SUBMIT</Text>
+            </Pressable>
+            {/* <Pressable
               style={{
                 height: 64,
                 width: 64,
@@ -588,7 +696,7 @@ const PublicationIndex = props => {
                 borderColor: '#fff',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginTop: width / 2.5,
+                marginTop: 50,
               }}>
               <Pressable
                 onPress={() => NavigationService.navigate('OwnPodcastLive')}
@@ -612,7 +720,7 @@ const PublicationIndex = props => {
                     backgroundColor: '#ED4040',
                   }}></View>
               </Pressable>
-            </Pressable>
+            </Pressable> */}
           </View>
         </ScreenLayout>
       )}
@@ -811,6 +919,26 @@ const styles = StyleSheet.create({
     width: '100%',
     fontSize: 15,
     color: '#fff',
+  },
+  upload: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: 350,
+    paddingHorizontal: 10,
+    marginTop: 10,
+  },
+  upload_text: {
+    fontFamily: Theme.FontFamily.normal,
+    textAlign: 'center',
+    fontSize: 15,
+    color: '#fff',
+  },
+  upload_btn: {
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
 });
 
