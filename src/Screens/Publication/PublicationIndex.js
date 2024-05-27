@@ -665,7 +665,7 @@ const PublicationIndex = props => {
                 </Text>
               )}
               {!audio && (
-                <Text style={styles.upload_text}>Upload Audio File</Text>
+                <Text style={styles.upload_text}> Upload Audio File</Text>
               )}
               <Pressable
                 style={styles.upload_btn}
