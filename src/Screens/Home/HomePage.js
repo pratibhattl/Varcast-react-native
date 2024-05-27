@@ -69,7 +69,7 @@ const HomePage = props => {
       const endpoint = 'follow/followings';
       const response = await apiCall(endpoint, 'GET', {}, token);
 
-      console.log('Raw response:', response); // Log the raw response
+      // console.log('Raw response:', response); // Log the raw response
 
       if (response?.status === true) {
         const usermappedData =
@@ -79,11 +79,7 @@ const HomePage = props => {
             email: item.followings.email,
             imageUrl: item.followings.full_path_image,
           }));
-        // console.log('User Data', usermappedData);
-        setUserData(usermappedData); // Ensure the state update function is correct
-        // console.log('User Data', usermappedData);
-      } else {
-        console.log('Unexpected response structure:', response);
+        setUserData(usermappedData);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
