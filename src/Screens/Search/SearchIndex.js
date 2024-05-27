@@ -195,7 +195,7 @@ const SearchIndex = props => {
                 <Pressable
                   onPress={() => {
                     if (cat === 0) {
-                      NavigationService.navigate('PodcastLive', {item});
+                      NavigationService.navigate('LiveDetails', {item});
                     } else if (cat === 1) {
                       NavigationService.navigate('PodcastLive', {item});
                     } else if (cat === 2) {

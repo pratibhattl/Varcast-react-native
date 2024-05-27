@@ -41,6 +41,7 @@ import UserDetails from '../Screens/Profile/UserDetails';
 import OurPicks from '../Screens/Home/OurPicks';
 import FollowingUser from '../Screens/Home/FollowingUser';
 import UploadScreen from '../Screens/Upload/UploadScreen';
+import LiveDetails from '../Screens/Live/Livedetails';
 const Stack = createNativeStackNavigator();
 
 function MainNavigation() {
@@ -205,6 +206,11 @@ function MainNavigation() {
         name="PodcastLive"
         options={{headerShown: false}}
         component={PodcastLive}
+      />
+      <Stack.Screen
+        name="LiveDetails"
+        options={{headerShown: false}}
+        component={LiveDetails}
       />
       <Stack.Screen
         name="OwnPodcastLive"
