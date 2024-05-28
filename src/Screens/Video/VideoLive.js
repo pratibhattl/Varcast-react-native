@@ -33,7 +33,6 @@ import ShareIcon from '../../assets/icons/ShareIcon';
 import RedHeartIcon from '../../assets/icons/RedHeartIcon';
 import CrossIcon from '../../assets/icons/CrossIcon';
 import {PermissionsAndroid, Platform} from 'react-native';
-import Video from 'react-native-video';
 import {
   ClientRoleType,
   createAgoraRtcEngine,
@@ -56,7 +55,6 @@ const VideoLive = props => {
   const route = useRoute();
   const selectedData = route.params?.item;
   console.log('select Data', selectedData);
-  const {width, height} = Dimensions.get('window');
   // Access the customProp passed from the source screen
   const customProp = route.params?.showButton;
   const [loadingState, changeloadingState] = useState(false);
@@ -93,6 +91,7 @@ const VideoLive = props => {
       });
     }
   };
+
 
   useEffect(() => {
     // Initialize Agora engine when the app starts
@@ -455,7 +454,7 @@ const VideoLive = props => {
           }}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Image
-              source={{uri: selectedData.image}} // Assuming 'image' is the key for the image URL in your selectedData object
+              source={{uri: selectedData?.image}} // Assuming 'image' is the key for the image URL in your selectedData object
               style={{
                 height: 38,
                 width: 38,
@@ -471,7 +470,7 @@ const VideoLive = props => {
                   fontSize: 14,
                   fontFamily: Theme.FontFamily.normal,
                 }}>
-                {selectedData.created_by_name}{' '}
+                {selectedData?.created_by_name}{' '}
                 {/* Assuming 'created_by_name' is the key for the name in your selectedData object */}
               </Text>
               <Text
@@ -482,20 +481,12 @@ const VideoLive = props => {
                   textAlign: 'center',
                   marginTop: 1,
                 }}>
-                {selectedData.views} views{' '}
+                {selectedData?.views} views{' '}
                 {/* Assuming 'views' is the key for the views count in your selectedData object */}
               </Text>
             </View>
           </View>
-          <View style={{flex: 1, backgroundColor: 'black'}}>
-            {/* <Video
-              source={{uri: selectedData.video_link}}
-              style={{width, height}}
-              resizeMode="contain"
-            /> */}
-          </View>
         </TouchableOpacity>
-
         {isJoined && props.route.params.host ? (
           <TouchableOpacity
             onPress={SwitchCamera}
