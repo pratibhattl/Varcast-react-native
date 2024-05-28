@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   View,
   Text,
@@ -62,7 +63,7 @@ import {requestMultiple, PERMISSIONS} from 'react-native-permissions';
 
 const {width, height} = Dimensions.get('screen');
 
-const PodcastLive = props => {
+const LiveDetails = props => {
   const route = useRoute();
   const selectedData = route.params?.item;
   const token = useSelector(state => state.authData.token);
@@ -307,29 +308,29 @@ const PodcastLive = props => {
   // Function to handle the press event of the heart icon
   const handleLikePress = () => {
     // console.log('Heart icon pressed');
-    const podcastId = selectedData?._id;
+    const liveId = selectedData?._id;
     // console.log('Hart', podcastId);
-    if (!podcastId) {
+    if (!liveId) {
       console.error('Podcast ID is missing');
       return;
     }
 
     const payload = {
-      podcastId: podcastId,
+      liveId: liveId,
     };
     console.log('PayLoad', payload);
 
-    apiCall('podcast/like', 'POST', payload, token)
+    apiCall('lives/like', 'POST', payload, token)
       .then(response => {
         console.log('Message', response.message);
         if (response.message === 'Liked') {
+          console.log('Live liked successfully');
           setLikeStatus('liked');
-          console.log('Podcast liked successfully');
-          HelperFunctions.showToastMsg('Podcast liked');
+          HelperFunctions.showToastMsg('Live Session liked');
         } else {
+          console.log('Live disliked successfully');
           setLikeStatus(null);
-          console.log('Podcast disliked successfully');
-          HelperFunctions.showToastMsg('Podcast Disliked');
+          HelperFunctions.showToastMsg('Live Session Disliked');
         }
       })
       .catch(error => {
@@ -614,22 +615,22 @@ const PodcastLive = props => {
                   </Text>
                 </View>
                 {/* <Pressable
-                                        onPress={() => {
-                                            // setModalVisible(false)
-                                            // NavigationService.navigate('Publication02')
-                                        }}
-                                        style={{
-                                            marginRight:20,
-                                            alignItems:'flex-end'
-                                        }}>
-                                      <Text style={{
-                                            color: 'rgba(255, 255, 255, 0.54)',
-                                            fontSize: 14,
-                                            fontFamily: Theme.FontFamily.light,
-                                            marginBottom: 3
-                                        }}>{res.time} </Text>
-                                        <DoubleTick/>
-                                    </Pressable> */}
+                                          onPress={() => {
+                                              // setModalVisible(false)
+                                              // NavigationService.navigate('Publication02')
+                                          }}
+                                          style={{
+                                              marginRight:20,
+                                              alignItems:'flex-end'
+                                          }}>
+                                        <Text style={{
+                                              color: 'rgba(255, 255, 255, 0.54)',
+                                              fontSize: 14,
+                                              fontFamily: Theme.FontFamily.light,
+                                              marginBottom: 3
+                                          }}>{res.time} </Text>
+                                          <DoubleTick/>
+                                      </Pressable> */}
               </View>
             </Pressable>
           );
@@ -808,21 +809,21 @@ const PodcastLive = props => {
             }}
           />
           {/* <View style={{flexDirection:'row',alignItems:'center',
-                marginTop:20,
-          
-          }}>
-              <ReportIcon Color = {'#fff'}/>
-              <Text
-              style={{
-                color: '#fff',
-                fontSize: 17,
-                fontFamily: Theme.FontFamily.normal,
-                marginLeft:15,
-                // marginTop:10,
-              }}>
-            Report
-            </Text>
-            </View> */}
+                  marginTop:20,
+            
+            }}>
+                <ReportIcon Color = {'#fff'}/>
+                <Text
+                style={{
+                  color: '#fff',
+                  fontSize: 17,
+                  fontFamily: Theme.FontFamily.normal,
+                  marginLeft:15,
+                  // marginTop:10,
+                }}>
+              Report
+              </Text>
+              </View> */}
           <View
             style={{flexDirection: 'row', alignItems: 'center', marginTop: 25}}>
             <ShiledIcon Color={'#fff'} />
@@ -976,7 +977,7 @@ const PodcastLive = props => {
   );
 };
 
-export default PodcastLive;
+export default LiveDetails;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -1028,29 +1029,29 @@ const styles = StyleSheet.create({
 
 {
   /* <ScreenLayout
-headerStyle={{ backgroundColor: 'rgba(27, 27, 27, 0.96);' }}
-showLoading={loadingState}
-isScrollable={true}
-leftHeading={'Podcast Details'}
-// Podcast
-// right
-Watch
-// Live={cat == 'Live' ? true : false}
-leftHeadingStyle={{ color: '#E1D01E' }}
-hideLeftIcon={customProp ? false : true}
-onLeftIconPress={() => NavigationService.back()}> 
- <Pressable style={{
-                    position: 'absolute',
-                    bottom: -25,
-                    right: 10,
-                    height: 50,
-                    width: 50,
-                    borderRadius: 30,
-                    backgroundColor: '#fff',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <VideoPlayIcon Width={30} Height={30} />
-                </Pressable>
-*/
+  headerStyle={{ backgroundColor: 'rgba(27, 27, 27, 0.96);' }}
+  showLoading={loadingState}
+  isScrollable={true}
+  leftHeading={'Podcast Details'}
+  // Podcast
+  // right
+  Watch
+  // Live={cat == 'Live' ? true : false}
+  leftHeadingStyle={{ color: '#E1D01E' }}
+  hideLeftIcon={customProp ? false : true}
+  onLeftIconPress={() => NavigationService.back()}> 
+   <Pressable style={{
+                      position: 'absolute',
+                      bottom: -25,
+                      right: 10,
+                      height: 50,
+                      width: 50,
+                      borderRadius: 30,
+                      backgroundColor: '#fff',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                  }}>
+                      <VideoPlayIcon Width={30} Height={30} />
+                  </Pressable>
+  */
 }
