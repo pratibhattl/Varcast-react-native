@@ -38,7 +38,10 @@ import {requestMultiple, PERMISSIONS} from 'react-native-permissions';
 import {PermissionsAndroid} from 'react-native';
 import {apiCall} from '../../Services/Service';
 import HelperFunctions from '../../Constants/HelperFunctions';
-
+import {useSelector} from 'react-redux';
+ import AllSourcePath from '../../Constants/PathConfig';
+ import RNFS from 'react-native-fs';
+ 
 // import { loadingState } from "../../../../../../../../";
 const {width, height} = Dimensions.get('screen');
 
@@ -53,31 +56,8 @@ const PublicationIndex = props => {
   const [loadingStates, changeloadingStates] = useState(false);
   const [Imagee, changeImagee] = useState('');
 
-  const [allImage, setAllImage] = useState([
-    {
-      img: 'https://cdn.vectorstock.com/i/preview-1x/82/99/no-image-available-like-missing-picture-vector-43938299.jpg',
-      self: true,
-    },
-    {img: require('../../assets/images/image104.png')},
-    {img: require('../../assets/images/image105.png')},
-    {img: require('../../assets/images/image154.png')},
-    {img: require('../../assets/images/image155.png')},
-    {img: require('../../assets/images/image156.png')},
-    {img: require('../../assets/images/image157.png')},
-    // {img:require('../../assets/images/image157(1).png')},
-    {img: require('../../assets/images/image158.png')},
-    {img: require('../../assets/images/image159.png')},
-    {img: require('../../assets/images/image160.png')},
-    {img: require('../../assets/images/image161.png')},
-    {img: require('../../assets/images/image162.png')},
-    {img: require('../../assets/images/image105.png')},
-    {img: require('../../assets/images/image154.png')},
-    {img: require('../../assets/images/image155.png')},
-    {img: require('../../assets/images/image156.png')},
-    {img: require('../../assets/images/image103.png')},
-  ]);
-  const token =
-    '007eJxTYJDTnWE2W0rEvP34VofPyjYnvafsOlvB7Tep6Oo8p+9cz64rMKSmmqWZGqcamqaZW5gYG6UlmVmYGadZJiWmpKRYJiUZ8+uxpjUEMjJo/QpkYIRCEJ+FoSS1uISBAQD59R5T';
+  const [allImage, setAllImage] = useState([]);
+  const token = useSelector(state => state.authData.token);
   const audioToken =
     '007eJxTYJDTnWE2W0rEvP34VofPyjYnvafsOlvB7Tep6Oo8p+9cz64rMKSmmqWZGqcamqaZW5gYG6UlmVmYGadZJiWmpKRYJiUZ8+uxpjUEMjJo/QpkYIRCEJ+FoSS1uISBAQD59R5T';
   const [cat, setCat] = useState('Publication');
@@ -105,11 +85,63 @@ const PublicationIndex = props => {
         PERMISSIONS.IOS.CAMERA,
         PERMISSIONS.IOS.MICROPHONE,
       ]).then(statuses => {
-        console.log('Camera', statuses[PERMISSIONS.IOS.CAMERA]);
-        console.log('MICROPHONE', statuses[PERMISSIONS.IOS.MICROPHONE]);
+        // console.log('Camera', statuses[PERMISSIONS.IOS.CAMERA]);
+        // console.log('MICROPHONE', statuses[PERMISSIONS.IOS.MICROPHONE]);
         // console.log('MEDIA_LIBRARY', statuses[PERMISSIONS.IOS.MEDIA_LIBRARY]);
       });
     }
+  };
+
+
+  const fetchAllPublicationList = async() => {
+    setLoader(true);
+    try {
+      const endpoint = 'videos/list';
+      const response = await apiCall(endpoint, 'GET', {}, token);
+      const data = response?.data?.listData; // Assuming response is already parsed as JSON
+      const mappedData = data?.map(item => ({
+        title: item.title,
+        slug: item.slug,
+        img: item.imageUrl,
+        videoUrl: item.videoUrl,
+      }));
+     setAllImage(mappedData);
+    } catch (error) {
+      // console.error('Error fetching data:', error);
+    }
+  };
+useEffect(()=>{
+  fetchAllPublicationList();
+},[])
+
+  const uploadPublicationData = (file) => {
+    console.log("Get file params",file);
+    setLoader(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    // Send formData to your API call
+    apiCall('videos/create', formData, '', 'multipart/form-data')
+      .then(response => {
+        console.log('response',response)
+        if (response?.status == 'true') {
+          changeImagee(url);
+          // let image = `${AllSourcePath.API_BASE_URL_DEV}upload`
+          allImage.unshift({img: url, self: true});
+          setAllImage([...allImage]);
+          setLoader(false);
+        } else {
+          // setModalVisible(true)
+          setLoader(false);
+        }
+      })
+      .catch(error => {
+        HelperFunctions.showToastMsg(error?.message);
+        setLoader(false);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
   };
   const openPhotoFromLocalPathExample = async () => {
     try {
@@ -128,6 +160,7 @@ const PublicationIndex = props => {
       if (pickerResult.cancelled) {
         return;
       }
+      // console.log("Selected images", pickerResult.path);
       const result = await PESDK.openEditor(pickerResult.path);
       // ImagePicker.openPicker({
       //     width: 300,
@@ -142,19 +175,28 @@ const PublicationIndex = props => {
       // const photo = require("../../assets/images/image105.png");
 
       // Open the photo editor and handle the export as well as any occuring errors.
-
-      if (result != null) {
+      const fileUri = pickerResult.path;
+      // const fileData = await RNFS.readFile(fileUri, 'base64');
+      const fileName = fileUri.split('/').pop();
+      const fileType = fileName.split('.').pop();
+    
+      const file = {
+        uri: fileUri,
+        name: fileName,
+        
+        type: `image/${fileType}`,
+      };
+      // if (result != null) {
         // The user exported a new photo successfully and the newly generated photo is located at `result.image`.
-        console.log('imageready,', result.image);
-        changeImagee(result.image);
-        allImage.unshift({img: result.image, self: true});
-        setAllImage([...allImage]);
+      
+        uploadPublicationData(file);
+       
         // setAllImage(s => s.map((res, ind) => ind == 0 ? { ...res, img: result.image,self:true } : { ...res }))
-      } else {
-        // The user tapped on the cancel button within the editor.
-        console.log('nocddt found');
-        return;
-      }
+      // } else {
+      //   // The user tapped on the cancel button within the editor.
+      //   console.log('nocddt found');
+      //   return;
+      // }
     } catch (error) {
       // There was an error generating the photo.
       console.log(error);
@@ -339,7 +381,6 @@ const PublicationIndex = props => {
         });
       } else {
         // The user tapped on the cancel button within the editor.
-        console.log('ddsffs', result);
         return;
       }
     } catch (error) {
@@ -477,7 +518,9 @@ const PublicationIndex = props => {
                         marginTop: 10,
                       }}>
                       <Image
-                        source={item.self ? {uri: item?.img} : item?.img}
+                        // source={item?.self ? {uri: item?.img} : item?.img}
+                        source={{uri: item?.img}}
+
                         style={{
                           height: 180,
                           width: 120,
