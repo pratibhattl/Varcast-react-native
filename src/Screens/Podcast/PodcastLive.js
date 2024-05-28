@@ -70,7 +70,8 @@ const PodcastLive = props => {
   // Access the customProp passed from the source screen
   const customProp = route.params?.showButton;
   const [loadingState, changeloadingState] = useState(false);
-  const [message, setMessage] = useState('');
+  const [comment, setComment] = useState('');
+  console.log('Comment', comment);
   const [ModalState, setModalState] = useState(false);
   const [GiftModalState, setGiftModalState] = useState(false);
   const [isLiked, setIsLiked] = useState(false); // State to track if the podcast is liked
@@ -154,6 +155,32 @@ const PodcastLive = props => {
       hostedby: 'Hosted by: Kevin Hart',
     },
   ]);
+  const [newComment, setNewComment] = useState([]);
+  useEffect(() => {
+    const fetchCommentData = async () => {
+      try {
+        const endpoint = 'podcast/list';
+        const id = selectedData?._id;
+        const response = await apiCall(endpoint, 'GET', {id}, token);
+
+        console.log('Raw response:', response);
+
+        if (response?.status === true) {
+          const userCommentData = response?.data;
+          console.log('CommentData', userCommentData);
+          // const userCommentData = response?.data?.map(item => ({
+          //   name: item.followings.name,
+          //   email: item.followings.email,
+          //   imageUrl: item.followings.full_path_image,
+          // }));
+          setNewComment(userCommentData);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    fetchCommentData();
+  }, []);
 
   const [messages, setMessages] = useState('');
   const agoraEngineRef = useRef(); // Agora engine instance
@@ -169,7 +196,7 @@ const PodcastLive = props => {
   //   '007eJxTYJDTnWE2W0rEvP34VofPyjYnvafsOlvB7Tep6Oo8p+9cz64rMKSmmqWZGqcamqaZW5gYG6UlmVmYGadZJiWmpKRYJiUZ8+uxpjUEMjJo/QpkYIRCEJ+FoSS1uISBAQD59R5T';
   const uid = 0;
   function showMessage(msg) {
-    setMessage(msg);
+    setMessagee(msg);
   }
   const getPermission = async () => {
     if (Platform.OS === 'android') {
@@ -306,35 +333,46 @@ const PodcastLive = props => {
 
   // Function to handle the press event of the heart icon
   const handleLikePress = () => {
-    // console.log('Heart icon pressed');
     const podcastId = selectedData?._id;
-    // console.log('Hart', podcastId);
     if (!podcastId) {
       console.error('Podcast ID is missing');
       return;
     }
-
     const payload = {
       podcastId: podcastId,
     };
     console.log('PayLoad', payload);
-
     apiCall('podcast/like', 'POST', payload, token)
       .then(response => {
-        console.log('Message', response.message);
+        // console.log('Message', response.message);
         if (response.message === 'Liked') {
           setLikeStatus('liked');
-          console.log('Podcast liked successfully');
+          // console.log('Podcast liked successfully');
           HelperFunctions.showToastMsg('Podcast liked');
         } else {
           setLikeStatus(null);
-          console.log('Podcast disliked successfully');
+          // console.log('Podcast disliked successfully');
           HelperFunctions.showToastMsg('Podcast Disliked');
         }
       })
       .catch(error => {
         console.error('Error while liking the podcast:', error);
       });
+  };
+
+  // Function to handle the Comment
+  const sendComment = () => {
+    const podcastId = selectedData?._id;
+    if (!podcastId) {
+      console.error('Podcast ID is missing');
+      return;
+    }
+    const payload = {
+      podcastId: podcastId,
+      comment: comment,
+    };
+    console.log('PayLoad', payload);
+    apiCall('podcast/comment', 'POST', payload, token);
   };
 
   return (
@@ -642,8 +680,8 @@ const PodcastLive = props => {
           multiline={true}
           style={[styles.input, {minHeight: 40, maxHeight: 100}]}
           placeholder="Message..."
-          value={messagee}
-          onChangeText={setMessagee}
+          value={comment}
+          onChangeText={setComment}
           placeholderTextColor={Theme.colors.grey}
         />
 
@@ -656,8 +694,9 @@ const PodcastLive = props => {
               // message.trim().length==0?Theme.colors.grey:Theme.colors.primary
             },
           ]}
-          //   onPress={()=>{ sendMsg() }}
-        >
+          onPress={() => {
+            sendComment();
+          }}>
           <SendIcon />
         </TouchableOpacity>
       </View>

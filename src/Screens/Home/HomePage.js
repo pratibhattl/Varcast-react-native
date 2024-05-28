@@ -59,7 +59,7 @@ const HomePage = props => {
       setLiveData(mappedData);
       console.log('Liveresponse', mappedData);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching Live data:', error);
     }
   };
 
@@ -78,8 +78,10 @@ const HomePage = props => {
             name: item.followings.name,
             email: item.followings.email,
             imageUrl: item.followings.full_path_image,
+            userId: item.followings._id,
           }));
         setUserData(usermappedData);
+        console.log('UserMapData', userData);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -340,7 +342,7 @@ const HomePage = props => {
           </Text>
         </View>
         <View>
-          <TouchableOpacity onPress={goToUserDetails}>
+          <TouchableOpacity>
             {userData?.length > 0 && (
               <FlatList
                 data={userData}
@@ -348,55 +350,79 @@ const HomePage = props => {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{paddingTop: 15, paddingLeft: 20}}
                 renderItem={({item}) => (
-                  <View
-                    style={{
-                      width: 128,
-                      height: 110,
-                      borderRadius: 15,
-                      marginRight: 20,
-                      borderTopRightRadius: 0,
-                      borderTopLeftRadius: 0,
-                      overflow: 'hidden',
-                      backgroundColor: 'transparent',
+                  <TouchableOpacity
+                    onPress={async () => {
+                      try {
+                        const response = await apiCall(
+                          'user-profile',
+                          'POST',
+                          {userId: item.userId},
+                          token,
+                        );
+
+                        if (response.status === true) {
+                          const userDetails = response.data;
+                          console.log('UserID', userDetails);
+                          NavigationService.navigate('UserDetails', {
+                            userData: userDetails,
+                          });
+                        } else {
+                          console.error('Failed to fetch user details');
+                        }
+                      } catch (error) {
+                        console.error('Error fetching user details:', error);
+                      }
                     }}>
-                    <Image
-                      source={{uri: item?.imageUrl}}
+                    <View
                       style={{
                         width: 128,
                         height: 110,
                         borderRadius: 15,
-                      }}
-                      resizeMode="cover"
-                    />
-                    <View
-                      style={{
-                        height: 35,
-                        width: 128,
-                        alignItems: 'center',
-                        alignSelf: 'center',
-                        position: 'absolute',
-                        justifyContent: 'center',
-                        bottom: 0,
-                        backgroundColor: 'rgba(200,200,200, 0.5)',
-                        opacity: 0.9,
+                        marginRight: 20,
+                        borderTopRightRadius: 0,
+                        borderTopLeftRadius: 0,
+                        overflow: 'hidden',
+                        backgroundColor: 'transparent',
                       }}>
+                      <Image
+                        source={{uri: item?.imageUrl}}
+                        style={{
+                          width: 128,
+                          height: 110,
+                          borderRadius: 15,
+                        }}
+                        resizeMode="cover"
+                      />
                       <View
                         style={{
-                          overflow: 'hidden',
-                          paddingTop: 5,
+                          height: 35,
+                          width: 128,
+                          alignItems: 'center',
+                          alignSelf: 'center',
+                          position: 'absolute',
+                          justifyContent: 'center',
+                          bottom: 0,
+                          backgroundColor: 'rgba(200,200,200, 0.5)',
+                          opacity: 0.9,
                         }}>
-                        <Text
+                        <View
                           style={{
-                            color: '#fff',
-                            fontSize: 14,
-                            fontFamily: 'YourFontFamily',
-                            marginHorizontal: 5,
+                            overflow: 'hidden',
+                            paddingTop: 5,
                           }}>
-                          {item.name}
-                        </Text>
+                          <Text
+                            style={{
+                              color: '#fff',
+                              fontSize: 14,
+                              fontFamily: 'YourFontFamily',
+                              marginHorizontal: 5,
+                            }}>
+                            {item.name}
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 )}
                 keyExtractor={(item, index) => index.toString()}
               />

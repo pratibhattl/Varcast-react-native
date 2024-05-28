@@ -184,7 +184,7 @@ const SearchIndex = props => {
                 <View
                   style={{marginLeft: 3, borderRadius: 10, overflow: 'hidden'}}>
                   <Image
-                    source={{uri: item.imageUrl}}
+                    source={{uri: item.image}}
                     style={{
                       height: 100,
                       width: 100,
