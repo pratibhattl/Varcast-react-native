@@ -70,10 +70,10 @@ const VideoLive = props => {
   const [isHostMic, setIsHosMic] = useState(true); // Client role
   const [remoteUid, setRemoteUid] = useState(0); // Uid of the remote user
   const [message, setMessage] = useState(''); // Message to the user
-  const appId = 'ee6f53e15f78432fb6863f9baddd9bb3';
+  const appId = '39dc863c99dc4f3d8723332b93d8be6';
   const channelName = 'test';
-  // const token =
-  //   '007eJxTYJDTnWE2W0rEvP34VofPyjYnvafsOlvB7Tep6Oo8p+9cz64rMKSmmqWZGqcamqaZW5gYG6UlmVmYGadZJiWmpKRYJiUZ8+uxpjUEMjJo/QpkYIRCEJ+FoSS1uISBAQD59R5T';
+  const agoraToken =
+    '007eJxTYHjbt+HxtvbWKfNaO8+80TWSetf371Gl8fXn7ly2Un7fvgcoMJgkGyabWKalJCaam5lYWpgnppqbJqUZmyWlmpgam5ianb4cmtYQyMiQcVKVgREKQXwWhpLU4hIGBgBKsSJo';
   const uid = 0;
   function showMessage(msg) {
     setMessage(msg);
@@ -103,9 +103,9 @@ const VideoLive = props => {
     setupVideoSDKEngine(appId, channelName);
     setTimeout(() => {
       if (props?.route?.params?.host) {
-        joinHost(channelName, token);
+        joinHost(channelName, agoraToken);
       } else {
-        joinAudience(channelName, token);
+        joinAudience(channelName, agoraToken);
       }
     }, 500);
     return () => {
@@ -196,7 +196,7 @@ const VideoLive = props => {
       );
 
       agoraEngineRef.current?.startPreview();
-      agoraEngineRef.current?.joinChannel(token, channelName, uid, {
+      agoraEngineRef.current?.joinChannel(agoraToken, channelName, uid, {
         clientRoleType: ClientRoleType.ClientRoleBroadcaster,
       });
       HelperFunctions.showToastMsg('Joined Successfully');
@@ -490,7 +490,7 @@ const VideoLive = props => {
           }}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Image
-              source={{uri: selectedData.image}} // Assuming 'image' is the key for the image URL in your selectedData object
+              source={{uri: selectedData?.image}} // Assuming 'image' is the key for the image URL in your selectedData object
               style={{
                 height: 38,
                 width: 38,
@@ -506,7 +506,7 @@ const VideoLive = props => {
                   fontSize: 14,
                   fontFamily: Theme.FontFamily.normal,
                 }}>
-                {selectedData.created_by_name}{' '}
+                {selectedData?.created_by_name}{' '}
                 {/* Assuming 'created_by_name' is the key for the name in your selectedData object */}
               </Text>
               <Text
@@ -517,7 +517,7 @@ const VideoLive = props => {
                   textAlign: 'center',
                   marginTop: 1,
                 }}>
-                {selectedData.views} views{' '}
+                {selectedData?.views} views{' '}
                 {/* Assuming 'views' is the key for the views count in your selectedData object */}
               </Text>
             </View>

@@ -20,6 +20,8 @@ import NavigationService from '../../Services/Navigation';
 import {useSelector} from 'react-redux';
 import {apiCall} from '../../Services/Service';
 import {useTranslation} from 'react-i18next';
+ import AllSourcePath from '../../Constants/PathConfig';
+
 
 const {width, height} = Dimensions.get('screen');
 
@@ -29,6 +31,9 @@ const SearchIndex = props => {
   const [filteredData, setFilteredData] = useState([]);
   const [cat, setCat] = useState(0);
   const [data, setData] = useState([]);
+
+  
+  const baseUrl = AllSourcePath.IMAGE_BASE_URL;
 
   useEffect(() => {
     console.log('Category changed:', cat);
@@ -159,8 +164,8 @@ const SearchIndex = props => {
           data={filteredData}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{paddingBottom: 20, paddingTop: 5}}
-          renderItem={({item}) => {
-            return (
+          renderItem={({ item }) => {
+                      return (
               <LinearGradient
                 colors={[
                   'rgba(255, 255, 255, 0.3)',
@@ -184,7 +189,7 @@ const SearchIndex = props => {
                 <View
                   style={{marginLeft: 3, borderRadius: 10, overflow: 'hidden'}}>
                   <Image
-                    source={{uri: item.imageUrl}}
+                    source={cat===1 ? {uri:`${baseUrl}${item?.image}`} : {uri: item.imageUrl}}
                     style={{
                       height: 100,
                       width: 100,

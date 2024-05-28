@@ -163,10 +163,10 @@ const PodcastLive = props => {
   const [messagee, setMessagee] = useState(''); // Message to the user
   const [podcasts, setPodcasts] = useState([]);
 
-  const appId = 'ee6f53e15f78432fb6863f9baddd9bb3';
+  const appId = '4c1c49fdaa764987ae75bf36be453456';
   const channelName = 'test';
-  // const token =
-  //   '007eJxTYJDTnWE2W0rEvP34VofPyjYnvafsOlvB7Tep6Oo8p+9cz64rMKSmmqWZGqcamqaZW5gYG6UlmVmYGadZJiWmpKRYJiUZ8+uxpjUEMjJo/QpkYIRCEJ+FoSS1uISBAQD59R5T';
+  const agoraToken =
+    '007eJxTYHjbt+HxtvbWKfNaO8+80TWSetf371Gl8fXn7ly2Un7fvgcoMJgkGyabWKalJCaam5lYWpgnppqbJqUZmyWlmpgam5ianb4cmtYQyMiQcVKVgREKQXwWhpLU4hIGBgBKsSJo';
   const uid = 0;
   function showMessage(msg) {
     setMessage(msg);
@@ -195,9 +195,9 @@ const PodcastLive = props => {
     setupAudioSDKEngine(appId, channelName);
     setTimeout(() => {
       if (props?.route?.params?.host) {
-        joinHost(channelName, token);
+        joinHost(channelName, agoraToken);
       } else {
-        joinAudience(channelName, token);
+        joinAudience(channelName, agoraToken);
       }
     }, 300);
     return () => {
@@ -265,7 +265,7 @@ const PodcastLive = props => {
       // channeloptions.audienceLatencyLevel =
       // AudienceLatencyLevelType.AudienceLatencyLevelLowLatency;
       agoraEngine.updateChannelMediaOptions(channeloptions);
-      agoraEngineRef.current?.joinChannel(token, channelName, uid, {
+      agoraEngineRef.current?.joinChannel(agoraToken, channelName, uid, {
         clientRoleType: ClientRoleType.ClientRoleAudience,
       });
       HelperFunctions.showToastMsg('Joined Successfully');
@@ -283,7 +283,7 @@ const PodcastLive = props => {
       agoraEngineRef.current?.setChannelProfile(
         ChannelProfileType.ChannelProfileLiveBroadcasting,
       );
-      agoraEngineRef.current?.joinChannel(token, channelName, uid, {
+      agoraEngineRef.current?.joinChannel(agoraToken, channelName, uid, {
         clientRoleType: ClientRoleType.ClientRoleBroadcaster,
       });
       HelperFunctions.showToastMsg('Joined Successfully');
