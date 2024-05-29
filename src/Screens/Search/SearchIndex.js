@@ -30,6 +30,7 @@ const SearchIndex = props => {
   const [filteredData, setFilteredData] = useState([]);
   const [cat, setCat] = useState(0);
   const [data, setData] = useState([]);
+ 
   const imageUrl = AllSourcePath.IMAGE_BASE_URL;
   useEffect(() => {
     console.log('Category changed:', cat);
@@ -160,8 +161,8 @@ const SearchIndex = props => {
           data={filteredData}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{paddingBottom: 20, paddingTop: 5}}
-          renderItem={({item}) => {
-            return (
+          renderItem={({ item }) => {
+                      return (
               <LinearGradient
                 colors={[
                   'rgba(255, 255, 255, 0.3)',
