@@ -98,6 +98,7 @@ const VideoLive = props => {
     }
   };
 
+
   useEffect(() => {
     // Initialize Agora engine when the app starts
     setupVideoSDKEngine(appId, channelName);
@@ -522,15 +523,7 @@ const VideoLive = props => {
               </Text>
             </View>
           </View>
-          <View style={{flex: 1, backgroundColor: 'black'}}>
-            {/* <Video
-              source={{uri: selectedData.video_link}}
-              style={{width, height}}
-              resizeMode="contain"
-            /> */}
-          </View>
         </TouchableOpacity>
-
         {isJoined && props.route.params.host ? (
           <TouchableOpacity
             onPress={SwitchCamera}

@@ -39,10 +39,10 @@ import {PermissionsAndroid} from 'react-native';
 import {apiCall} from '../../Services/Service';
 import HelperFunctions from '../../Constants/HelperFunctions';
 import {useSelector} from 'react-redux';
- import AllSourcePath from '../../Constants/PathConfig';
- import RNFS from 'react-native-fs';
- import DocumentPicker from 'react-native-document-picker';
-import RNFetchBlob from 'rn-fetch-blob'
+import AllSourcePath from '../../Constants/PathConfig';
+import RNFS from 'react-native-fs';
+import DocumentPicker from 'react-native-document-picker';
+import RNFetchBlob from 'rn-fetch-blob';
 import axios from 'axios';
 // import { loadingState } from "../../../../../../../../";
 const {width, height} = Dimensions.get('screen');
@@ -96,8 +96,7 @@ const PublicationIndex = props => {
     }
   };
 
-
-  const fetchAllPublicationList = async() => {
+  const fetchAllPublicationList = async () => {
     setLoader(true);
     try {
       const endpoint = 'videos/list';
@@ -109,25 +108,30 @@ const PublicationIndex = props => {
         img: item.imageUrl,
         videoUrl: item.videoUrl,
       }));
-     setAllImage(mappedData);
+      setAllImage(mappedData);
     } catch (error) {
-      // console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error);
     }
   };
-useEffect(()=>{
-  fetchAllPublicationList();
-},[])
+  useEffect(() => {
+    fetchAllPublicationList();
+  }, []);
 
-  const uploadPublicationData = (file) => {
-    console.log("Get file params",file);
+  const uploadPublicationData = file => {
     setLoader(true);
     const formData = new FormData();
     formData.append('image', file);
 
-    // Send formData to your API call
-    apiCall('videos/create', formData, '', 'multipart/form-data')
+    // apiCall('videos/create', formData, '', 'multipart/form-data')
+    axios
+      .post(`${baseUrl}videos/create`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${tokenData}`,
+        },
+      })
       .then(response => {
-        console.log('response',response)
+        console.log('response', response);
         if (response?.status == 'true') {
           changeImagee(url);
           // let image = `${AllSourcePath.API_BASE_URL_DEV}upload`
@@ -183,26 +187,24 @@ useEffect(()=>{
       // const fileData = await RNFS.readFile(fileUri, 'base64');
       const fileName = fileUri.split('/').pop();
       const fileType = fileName.split('.').pop();
-    
+
       const file = {
         uri: fileUri,
         name: fileName,
-        
+
         type: `image/${fileType}`,
       };
       // if (result != null) {
-        // The user exported a new photo successfully and the newly generated photo is located at `result.image`.
-      
-        uploadPublicationData(file);
-       
-        // setAllImage(s => s.map((res, ind) => ind == 0 ? { ...res, img: result.image,self:true } : { ...res }))
+
+      uploadPublicationData(file);
+
+      // setAllImage(s => s.map((res, ind) => ind == 0 ? { ...res, img: result.image,self:true } : { ...res }))
       // } else {
       //   // The user tapped on the cancel button within the editor.
       //   console.log('nocddt found');
       //   return;
       // }
     } catch (error) {
-      // There was an error generating the photo.
       console.log(error);
     }
   };
@@ -269,7 +271,7 @@ useEffect(()=>{
       const result = await VESDK.openEditor(video, configuration);
       if (result != null) {
         // The user exported a new video successfully and the newly generated video is located at `result.video`.
-        console.log('videdoready', result);
+
         console.log('videdoready', result.video, {
           ...result,
           path: result.video,
@@ -421,6 +423,8 @@ useEffect(()=>{
       });
   };
 
+  //---------------------------------------------------------------------------------------------------//
+
   //  Create new podcast //
 
   const uploadFileOnPressHandler = async () => {
@@ -434,32 +438,29 @@ useEffect(()=>{
         ? setAudio(pickedFile)
         : setPickedImg(pickedFile);
 
-        const realPath= await RNFetchBlob.fs.contentUriToPath(pickedFile.uri)
-      
-       setImgUrl(`file://${realPath}`)
-      
-      await RNFS.readFile(pickedFile.uri, 'base64').then(data => {
-        // console.log('base64', data);
-        setImgUrl(data);
-      });
+      if (pickedFile.type === 'image/jpeg') {
+        console.log('START');
+        // const realPath = await RNFetchBlob.fs.contentUriToPath(pickedFile.uri);
+        // console.log('img', `file://${realPath}`);
+
+        const abc = await RNFS.readFile(pickedFile.uri, 'base64');
+        console.log('abc',abc)
+        setImgUrl(abc)
+      }
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
-        console.log(err);
+        console.log('err', err);
       } else {
-        console.log(error);
+        console.log('error', error);
         throw err;
       }
     }
   };
 
-  // formData.append('videoUrl', {
-  //   uri: 'https://www.youtube.com/watch?v=ixr7ZYgH_6I',
-  //   filename: 'avc',
-  //   type: 'video/mp4',
-  // });
   const tokenData = useSelector(state => state.authData.token);
 
   const baseUrl = AllSourcePath.API_BASE_URL_DEV;
+  const imageUrl = AllSourcePath.IMAGE_BASE_URL;
 
   const fileSubmit = async () => {
     let formData = new FormData();
@@ -467,50 +468,29 @@ useEffect(()=>{
     formData.append('title', name);
     formData.append('overview', overView);
     formData.append('image', pickedImg);
-    formData.append('image', audio);
-
+    formData.append('audio', audio);
     console.log(formData);
     setLoader(true);
 
     try {
-      // const data = await axios.post(`${baseUrl}/podcast/create`, formData, {
-      //   headers: {
-      //     'Content-Type': 'multipart/form-data',
-      //     Authorization: `Bearer ${tokenData}`,
-      //   },
-      // });
-      const data =  apiCall('podcast/create', formData,token, 'multipart/form-data')
-      console.log('data', data);
+      const data = await axios.post(`${baseUrl}podcast/create`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${tokenData}`,
+        },
+      });
+      setName('');
+      setOverView('');
+      setPickedImg();
+      setAudio();
+      HelperFunctions.showToastMsg('Podcast has been sucessfully uploaded');
+      NavigationService.navigate('ProfileIndex');
       return data;
     } catch (error) {
       console.log('error', error);
       HelperFunctions.showToastMsg(error?.message);
       setLoader(false);
     }
-
-    // apiCall('podcast/create', formData , '', 'multipart/form-data')
-    //   .then(response => {
-    //     console.log('response', response);
-    //     if (response.status === "SUCCESS") {
-    //        setName('');
-    //     setOverView('');
-    //     setPickedImg();
-    //      setAudio();
-    //      HelperFunctions.showToastMsg('Podcast has been sucessfully uploaded');
-    //     NavigationService.navigate('ProfileIndex');
-    //     }
-
-    //   })
-    //   .catch(error => {
-    //     console.log('error',error)
-    //     HelperFunctions.showToastMsg(error?.message);
-    //     setLoader(false);
-    //   })
-    //   .finally(() => {
-
-    //     setLoader(false);
-
-    //   });
   };
 
   useEffect(() => {
@@ -525,6 +505,9 @@ useEffect(()=>{
     }
     // console.log('Image.resolveAssetSource(source).uri',URL.createObjectURL('https://pagalnew.com/download128/45972'))
   }, []);
+
+  console.log('imgUrl', imgUrl);
+
   return (
     <View style={{flex: 1}}>
       {/* {console.log('sdsdsdsdsd>>>>>>',allImage)} */}
@@ -616,8 +599,7 @@ useEffect(()=>{
                       }}>
                       <Image
                         // source={item?.self ? {uri: item?.img} : item?.img}
-                        source={{uri: item?.img}}
-
+                        source={{uri: `${imageUrl}${item?.img}`}}
                         style={{
                           height: 180,
                           width: 120,
@@ -682,7 +664,13 @@ useEffect(()=>{
                 borderWidth: 2,
                 borderColor: 'rgba(255, 255, 255, 0.14)',
               }}>
-              {pickedImg?.uri && <Image source={imgUrl} resizeMode='cover' style={{ width: 200, height: 200 }}/>}
+              {pickedImg?.uri && (
+                <Image
+                  source={{uri: `data:image/jpeg;base64,${imgUrl}`}}
+                  resizeMode='cover'
+                  style={{width: 200, height: 200}}
+                />
+              )}
 
               {!pickedImg && <GallaryIcon />}
             </Pressable>
