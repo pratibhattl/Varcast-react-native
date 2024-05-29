@@ -47,6 +47,7 @@ import CrownIcon from '../../assets/icons/CrownIcon';
 import {PermissionsAndroid, Platform} from 'react-native';
 import {useSelector} from 'react-redux';
 import {apiCall} from '../../Services/Service';
+import AllSourcePath from '../../Constants/PathConfig';
 // import {toast} from 'react-toastify';
 import {
   ClientRoleType,
@@ -65,6 +66,7 @@ const {width, height} = Dimensions.get('screen');
 const PodcastLive = props => {
   const route = useRoute();
   const selectedData = route.params?.item;
+  console.log('SelectedData', selectedData);
   const token = useSelector(state => state.authData.token);
   const [likeStatus, setLikeStatus] = useState(null);
   // Access the customProp passed from the source screen
@@ -74,6 +76,7 @@ const PodcastLive = props => {
   console.log('Comment', comment);
   const [ModalState, setModalState] = useState(false);
   const [GiftModalState, setGiftModalState] = useState(false);
+  const imageUrl = AllSourcePath.IMAGE_BASE_URL;
   const [isLiked, setIsLiked] = useState(false); // State to track if the podcast is liked
 
   const [GiftData, setGiftData] = useState([
@@ -449,7 +452,7 @@ const PodcastLive = props => {
                   backgroundColor: 'red',
                 }}>
                 <Image
-                  source={{uri: selectedData.image}}
+                  source={{uri: `${imageUrl}${selectedData?.image}`}}
                   style={{
                     height: 38,
                     width: 38,
@@ -522,7 +525,7 @@ const PodcastLive = props => {
                 overflow: 'hidden',
               }}>
               <Image
-                source={{uri: selectedData.imageUrl}}
+                source={{uri: `${imageUrl}${selectedData?.image}`}}
                 style={{
                   height: 140,
                   width: 140,

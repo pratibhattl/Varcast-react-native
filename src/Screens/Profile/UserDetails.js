@@ -35,7 +35,7 @@ import CustomHeader from '../../Components/Header/CustomHeader';
 const UserDetails = props => {
   const route = useRoute();
   const {userData} = route.params;
-  // console.log(userData);
+  console.log(userData.latest_podcasts);
   // console.log(userData.name);
   const Tab = createMaterialTopTabNavigator();
   const [loadingState, setLoadingState] = useState(false);
