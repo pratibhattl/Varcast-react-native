@@ -668,7 +668,6 @@ const PublicationIndex = props => {
                 <Image
                   source={{uri: `data:image/jpeg;base64,${imgUrl}`}}
                   resizeMode='cover'
-                  style={{width: 200, height: 200}}
                 />
               )}
 
